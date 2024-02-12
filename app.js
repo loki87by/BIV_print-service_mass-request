@@ -5,7 +5,7 @@ require("dotenv/config");
 
 const app = express();
 const server = http.createServer(app);
-const CONTRACT_IDS = process.env.CONTRACT_IDS.split(/,\s/gi);
+const CONTRACT_IDS = process.env.CONTRACT_IDS.split(/,\s?/gi);
 const { HOST_AND_PORT, METHOD, NEED_REPRINT, SAMPLE } = process.env;
 
 let flags = [];
