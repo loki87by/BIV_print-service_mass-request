@@ -6,7 +6,7 @@ require("dotenv/config");
 const app = express();
 const server = http.createServer(app);
 const CONTRACT_IDS = process.env.CONTRACT_IDS.split(/,\s?/gi);
-const { HOST_AND_PORT, METHOD, NEED_REPRINT, SAMPLE } = process.env;
+const { HOST_AND_PORT, METHOD, NEED_REPRINT, SAMPLE, SSL } = process.env;
 
 let flags = [];
 const data = {
@@ -75,7 +75,7 @@ function sender(index) {
   flags.push(false);
   const dataId = data.contractId;
   const url =
-    `http://${HOST_AND_PORT}/print-service-gate/${METHOD}`;
+    `http${SSL ? 's' : ''}://${HOST_AND_PORT}/print-service-gate/${METHOD}`;
   request(
     {
       method: "POST",
