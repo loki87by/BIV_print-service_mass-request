@@ -17,8 +17,8 @@ const data = {
 };
 const resArr = [];
 
-function getReport(arr, index) {
-  arr.forEach((element) => {
+function getReport(arr) {
+  arr.forEach((element, index) => {
     let str = `По ${element.counter} договор`;
     if (element.data.length === 1) {
       str += `у: ${element.data[0]} пришел ответ `;
@@ -29,6 +29,7 @@ function getReport(arr, index) {
     console.log(str);
     if (index === arr.length - 1) {
       console.log("работа завершена");
+      process.exit();
     }
   });
 }
