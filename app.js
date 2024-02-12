@@ -12,12 +12,12 @@ let flags = [];
 const data = {
   contractId: "",
   htmlPathName: "HTMLMAILPATH",
-  needReprint: NEED_REPRINT,
-  sample: SAMPLE,
+  needReprint: NEED_REPRINT === "true",
+  sample: SAMPLE === "true",
 };
 const resArr = [];
 
-function getReport(arr) {
+function getReport(arr, index) {
   arr.forEach((element) => {
     let str = `По ${element.counter} договор`;
     if (element.data.length === 1) {
@@ -27,6 +27,9 @@ function getReport(arr) {
     }
     str += `с кодом: ${element.code} и текстом: \n${element.message}\n`;
     console.log(str);
+    if (index === arr.length - 1) {
+      console.log("работа завершена");
+    }
   });
 }
 
@@ -39,7 +42,19 @@ function checkFlags() {
       if (!p) {
         p = [];
       }
-      if (!p.some((el) => el.code === i.data.status.code)) {
+      if (!i.data && !p.some((el) => el.code === "-")) {
+        const data = {
+          code: "-",
+          message: "Неизвестная ошибка",
+          data: [i.id],
+          counter: 1,
+        };
+        p.push(data);
+      } else if (!i.data && p.some((el) => el.code === "-")) {
+        const cur = p.find((el) => el.code === "-");
+        cur.data.push(i.id);
+        cur.counter++;
+      } else if (!p.some((el) => el.code === i.data.status.code)) {
         const data = {
           code: i.data.status.code,
           message: i.data.status.text,
@@ -74,8 +89,9 @@ function checkFlags() {
 function sender(index) {
   flags.push(false);
   const dataId = data.contractId;
-  const url =
-    `http${SSL ? 's' : ''}://${HOST_AND_PORT}/print-service-gate/${METHOD}`;
+  const url = `http${
+    SSL === "true" ? "s" : ""
+  }://${HOST_AND_PORT}/print-service-gate/${METHOD}`;
   request(
     {
       method: "POST",
@@ -86,7 +102,10 @@ function sender(index) {
       body: JSON.stringify(data),
     },
     (error, response) => {
-      resArr.push({ id: dataId, data: JSON.parse(response.body) });
+      resArr.push({
+        id: dataId,
+        data: response ? JSON.parse(response.body) : null,
+      });
       flags[index] = true;
       checkFlags();
     }
